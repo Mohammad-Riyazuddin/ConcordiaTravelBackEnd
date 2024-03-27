@@ -2,7 +2,7 @@
 
 from django.urls import path
 from .views import PackageList, PackageDetail, FlightDetail, FlightList, HotelList, HotelDetail, ActivityList, \
-    AcitivityDetail, BookingViewSet, RegisterView, LoginView, LogoutView, UserDetailsView
+    AcitivityDetail, BookingViewSet, BookingDetail, RegisterView, LoginView, LogoutView, UserDetailsView
 from rest_framework.authtoken.views import obtain_auth_token
 
 urlpatterns = [
@@ -10,7 +10,8 @@ urlpatterns = [
     path('hotels/', HotelList.as_view(), name='hotel-list-create'),
     path('activities/', ActivityList.as_view(), name='activity-list-create'),
     path('packages/', PackageList.as_view(), name='package-list'),
-    path('bookings/', BookingViewSet.as_view(), name='Login'),
+    path('bookings/', BookingViewSet.as_view(), name='Bookings'),
+    path('bookings/<int:pk>/', BookingDetail.as_view(), name='Bookings-Details'),
     path('packages/<int:pk>/', PackageDetail.as_view(), name='package-detail'),
     path('flights/<int:pk>/', FlightDetail.as_view(), name='flight-detail'),
     path('activities/<int:pk>/', AcitivityDetail.as_view(), name='activity-detail'),

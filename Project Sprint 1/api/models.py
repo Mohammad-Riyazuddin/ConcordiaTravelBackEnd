@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser, Permission
 from django.contrib.auth.models import Group
 from django.utils.translation import gettext_lazy as _
+from travel import settings
 
 
 class Flight(models.Model):
@@ -54,20 +55,24 @@ class Package(models.Model):
 
 
 class Booking(models.Model):
+    STATUS_CHOICES = (
+        ('Booked', 'Booked'),
+    )
+    user_name = models.CharField(max_length=255, blank=True, null=True)
     package = models.ForeignKey(Package, on_delete=models.CASCADE)
-    flight = models.ForeignKey(Flight, on_delete=models.SET_NULL, null=True)
-    hotel = models.ForeignKey(Hotel, on_delete=models.SET_NULL, null=True)
-    activity = models.ForeignKey(Activity, on_delete=models.SET_NULL, null=True)
-    num_people = models.PositiveIntegerField(default=1)
-    booking_description = models.TextField()
-    booking_status = models.CharField(max_length=20, choices=[('Pending', 'Pending'), ('Confirmed', 'Confirmed')])
-    total_cost = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
+    booking_date = models.DateTimeField(blank=True, null=True)
+    cancel_date = models.DateTimeField(blank=True, null=True)
+    status = status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='Booked')
 
-# class payment ()
-#     Username:
-#     booking id:
-#     payment method 
-#     Amout :
+    def save(self, *args, **kwargs):
+        # Update status based on cancel_date
+        if self.cancel_date is not None:
+            self.status = 'Canceled'
+        super().save(*args, **kwargs)
+        
+    def __str__(self):
+        return self.user_name
+
 
 
 class CustomUser(AbstractUser):

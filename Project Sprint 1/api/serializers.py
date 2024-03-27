@@ -35,9 +35,16 @@ class PackageSerializer(serializers.ModelSerializer):
 
 
 class BookingSerializer(serializers.ModelSerializer):
+    package_details = PackageSerializer(source='package', read_only=True)
     class Meta:
         model = Booking
         fields = '__all__'
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        # Only include cancel_date in the response if it's not None
+        if instance.cancel_date is None:
+            del data['cancel_date']
+        return data
 
 
 User = get_user_model()

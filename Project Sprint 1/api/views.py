@@ -1,6 +1,6 @@
 # travel/views.py
 
-from rest_framework import generics
+from rest_framework import generics, permissions
 from rest_framework.authtoken.models import Token
 
 from .models import Package, Flight, Hotel, Activity, Booking
@@ -55,10 +55,9 @@ class BookingViewSet(generics.ListCreateAPIView):
     queryset = Booking.objects.all()
     serializer_class = BookingSerializer
 
-    def perform_create(self, serializer):
-        # Automatically set the logged-in user as the booking user
-        serializer.save(user=self.request.user)
-
+class BookingDetail(generics.RetrieveUpdateAPIView):
+    queryset = Booking.objects.all()
+    serializer_class = BookingSerializer
 
 class RegisterView(APIView):
     def post(self, request):
@@ -86,7 +85,7 @@ class LogoutView(APIView):
 
 
 class UserDetailsView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
         serializer = UserDetailsSerializer(request.user)
