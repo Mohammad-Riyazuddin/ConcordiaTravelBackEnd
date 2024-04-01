@@ -12,10 +12,11 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+
 class PackageList(generics.ListCreateAPIView):
     queryset = Package.objects.all()
     serializer_class = PackageSerializer
-    
+
     def get_serializer_context(self):
         context = super().get_serializer_context()
         context['flight_serializer'] = FlightSerializer
@@ -23,41 +24,51 @@ class PackageList(generics.ListCreateAPIView):
         context['activity_serializer'] = ActivitySerializer
         return context
 
+
 class PackageDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Package.objects.all()
     serializer_class = PackageSerializer
-    
+
+
 class FlightList(generics.ListCreateAPIView):
     queryset = Flight.objects.all()
     serializer_class = FlightSerializer
+
 
 class FlightDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Flight.objects.all()
     serializer_class = FlightSerializer
 
+
 class HotelList(generics.ListCreateAPIView):
     queryset = Hotel.objects.all()
     serializer_class = HotelSerializer
+
 
 class HotelDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Hotel.objects.all()
     serializer_class = HotelSerializer
 
+
 class ActivityList(generics.ListCreateAPIView):
     queryset = Activity.objects.all()
     serializer_class = ActivitySerializer
-    
+
+
 class AcitivityDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Activity.objects.all()
     serializer_class = ActivitySerializer
-    
+
+
 class BookingViewSet(generics.ListCreateAPIView):
     queryset = Booking.objects.all()
     serializer_class = BookingSerializer
 
+
 class BookingDetail(generics.RetrieveUpdateAPIView):
     queryset = Booking.objects.all()
     serializer_class = BookingSerializer
+
 
 class RegisterView(APIView):
     def post(self, request):
@@ -74,7 +85,7 @@ class LoginView(APIView):
         if serializer.is_valid():
             user = serializer.validated_data
             token, created = Token.objects.get_or_create(user=user)
-            return Response({'token': token.key}, status=status.HTTP_200_OK)
+            return Response({'token': token.key, 'userId': user.id}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 

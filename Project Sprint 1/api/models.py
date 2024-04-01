@@ -54,27 +54,6 @@ class Package(models.Model):
         return self.name
 
 
-class Booking(models.Model):
-    STATUS_CHOICES = (
-        ('Booked', 'Booked'),
-    )
-    user_name = models.CharField(max_length=255, blank=True, null=True)
-    package = models.ForeignKey(Package, on_delete=models.CASCADE)
-    booking_date = models.DateTimeField(blank=True, null=True)
-    cancel_date = models.DateTimeField(blank=True, null=True)
-    status = status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='Booked')
-
-    def save(self, *args, **kwargs):
-        # Update status based on cancel_date
-        if self.cancel_date is not None:
-            self.status = 'Canceled'
-        super().save(*args, **kwargs)
-        
-    def __str__(self):
-        return self.user_name
-
-
-
 class CustomUser(AbstractUser):
     USER_TYPE_CHOICES = (
         ('CUSTOMER', 'Customer'),
@@ -91,7 +70,7 @@ class CustomUser(AbstractUser):
             'The groups this user belongs to. A user will get all permissions '
             'granted to each of their groups.'
         ),
-        related_name="customuser_set", # Add or change the related_name here
+        related_name="customuser_set",  # Add or change the related_name here
         related_query_name="customuser",
     )
     user_permissions = models.ManyToManyField(
@@ -99,7 +78,7 @@ class CustomUser(AbstractUser):
         verbose_name=_('user permissions'),
         blank=True,
         help_text=_('Specific permissions for this user.'),
-        related_name="customuser_set", # Add or change the related_name here
+        related_name="customuser_set",  # Add or change the related_name here
         related_query_name="customuser",
     )
 
@@ -108,3 +87,29 @@ class CustomUser(AbstractUser):
 
     def is_agent(self):
         return self.user_type == 'AGENT'
+
+
+class Booking(models.Model):
+    STATUS_CHOICES = (
+        ('Pending', 'Pending'),
+        ('Booked', 'Booked'),
+        ('Canceled', 'Canceled')
+    )
+    user_id = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    package = models.ForeignKey(Package, on_delete=models.CASCADE, blank=True, null=True)
+    booking_date = models.DateTimeField(blank=True, null=True)
+    cancel_date = models.DateTimeField(blank=True, null=True)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='Pending')
+    bookingCost = models.DecimalField(max_digits=10, decimal_places=2, blank=False, null=False)
+
+    def save(self, *args, **kwargs):
+        # Update status based on cancel_date
+        if self.cancel_date is not None:
+            self.status = 'Canceled'
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.user_name
+
+
+
