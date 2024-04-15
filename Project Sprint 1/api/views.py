@@ -4,18 +4,17 @@ from rest_framework import generics, permissions
 from rest_framework.authtoken.models import Token
 
 from .models import Package, Flight, Hotel, Activity, Booking
-from .serializers import PackageSerializer, FlightSerializer, HotelSerializer, ActivitySerializer, BookingSerializer, \
-    UserSerializer, LoginSerializer, TokenSerializer, UserDetailsSerializer
-from django.contrib.auth import authenticate
-from rest_framework.permissions import IsAuthenticated
+from .serializers import PackageDetailSerializer, FlightSerializer, HotelSerializer, ActivitySerializer, BookingSerializer, \
+    UserSerializer, LoginSerializer, UserDetailsSerializer, PackageCreateSerializer, BookingCreateSerializer
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.contrib.auth.models import Group, User
 
 
 class PackageList(generics.ListCreateAPIView):
     queryset = Package.objects.all()
-    serializer_class = PackageSerializer
+    serializer_class = PackageCreateSerializer
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
@@ -27,7 +26,7 @@ class PackageList(generics.ListCreateAPIView):
 
 class PackageDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Package.objects.all()
-    serializer_class = PackageSerializer
+    serializer_class = PackageDetailSerializer
 
 
 class FlightList(generics.ListCreateAPIView):
@@ -62,7 +61,7 @@ class AcitivityDetail(generics.RetrieveUpdateDestroyAPIView):
 
 class BookingViewSet(generics.ListCreateAPIView):
     queryset = Booking.objects.all()
-    serializer_class = BookingSerializer
+    serializer_class = BookingCreateSerializer
 
 
 class BookingDetail(generics.RetrieveUpdateAPIView):
@@ -73,9 +72,23 @@ class BookingDetail(generics.RetrieveUpdateAPIView):
 class RegisterView(APIView):
     def post(self, request):
         serializer = UserSerializer(data=request.data)
+        print(request.data.get('user_type'))
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            user = serializer.save()
+            # Determine user type based on username
+            if request.data.get('user_type') == 'admin':
+                group, _ = Group.objects.get_or_create(name='Admin')
+                user.is_staff = True
+            elif request.data.get('user_type') == 'agent':
+                group, _ = Group.objects.get_or_create(name='Agent')
+                user.is_staff = True
+            elif request.data.get('user_type') == 'customer':
+                group, _ = Group.objects.get_or_create(name='Customer')
+                user.is_staff = False
+            user.groups.add(group)
+            # Generate token for the user
+            token, created = Token.objects.get_or_create(user=user)
+            return Response({'token': token.key, 'user_id': user.id, 'user_type': group.name}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -85,7 +98,7 @@ class LoginView(APIView):
         if serializer.is_valid():
             user = serializer.validated_data
             token, created = Token.objects.get_or_create(user=user)
-            return Response({'token': token.key, 'userId': user.id}, status=status.HTTP_200_OK)
+            return Response({'token': token.key, 'userId': user.id, 'isStaff': user.is_staff}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -108,3 +121,13 @@ class UserDetailsView(APIView):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=400)
+
+
+class UserListView(generics.ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+
+class UserDeleteView(generics.DestroyAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer

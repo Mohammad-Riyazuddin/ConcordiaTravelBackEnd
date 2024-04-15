@@ -2,7 +2,7 @@
 
 from django.urls import path
 from .views import PackageList, PackageDetail, FlightDetail, FlightList, HotelList, HotelDetail, ActivityList, \
-    AcitivityDetail, BookingViewSet, BookingDetail, RegisterView, LoginView, LogoutView, UserDetailsView
+    AcitivityDetail, BookingViewSet, BookingDetail, RegisterView, UserDeleteView, LoginView, LogoutView, UserDetailsView, UserListView
 from rest_framework.authtoken.views import obtain_auth_token
 
 urlpatterns = [
@@ -20,4 +20,6 @@ urlpatterns = [
     path('login/', LoginView.as_view(), name='login'),
     path('logout/', LogoutView.as_view(), name='logout'),
     path('user-details/', UserDetailsView.as_view(), name='user-details'),
+    path('users/', UserListView.as_view(), name='user-list'),
+    path('users/<int:pk>/', UserDeleteView.as_view(), name='user-delete')
 ]
