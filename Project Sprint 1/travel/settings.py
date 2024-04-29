@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -39,7 +40,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
-    'knox'
+    'knox',
+    'django_s3_sqlite'
 ]
 
 MIDDLEWARE = [
@@ -58,7 +60,7 @@ ROOT_URLCONF = 'travel.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -128,10 +130,13 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
 ]
 
-AUTH_USER_MODEL = 'api.CustomUser'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
     ]
 }
+
+STRIPE_SECRET_KEY = 'sk_test_51P8Zm0RxfplXKOJhl8dkdruQddm7pQhzdRECMesH9g7kwacYAdWzjqsud2v9twf6Ke0XFLvcMvJiPH7yzKVD7S1400u91RQ0vN'
+
+SITE_URL = 'http://localhost:3000'

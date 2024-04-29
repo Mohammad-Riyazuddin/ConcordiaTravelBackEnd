@@ -11,11 +11,11 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.RemoveField(
-            model_name='customuser',
+            model_name='User',
             name='groups',
         ),
         migrations.RemoveField(
-            model_name='customuser',
+            model_name='User',
             name='user_permissions',
         ),
         migrations.RemoveField(
@@ -26,6 +26,6 @@ class Migration(migrations.Migration):
             name='Customer',
         ),
         migrations.DeleteModel(
-            name='CustomUser',
+            name='User',
         ),
     ]
