@@ -82,7 +82,7 @@ class BookingCreateSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('username', 'email', 'password')  # Remove 'user_type'
+        fields = ('username', 'email', 'password', 'is_staff')  # Remove 'user_type'
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
@@ -125,3 +125,4 @@ class BookingViewSet(viewsets.ModelViewSet):
             return BookingCreateSerializer
         else:
             return BookingSerializer
+

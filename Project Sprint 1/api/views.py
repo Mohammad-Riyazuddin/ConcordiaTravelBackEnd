@@ -88,7 +88,7 @@ class RegisterView(APIView):
             user.groups.add(group)
             # Generate token for the user
             token, created = Token.objects.get_or_create(user=user)
-            return Response({'token': token.key, 'user_id': user.id, 'user_type': group.name}, status=status.HTTP_201_CREATED)
+            return Response({'token': token.key, 'user_id': user.id, 'user_type': user.is_staff}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
